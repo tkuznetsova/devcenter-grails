@@ -35,17 +35,17 @@ class AuthenticationController {
 	
 	def login_form = {
 		// Display a page offering the appropriate options by default, but only in development!
-		if (GrailsUtil.environment != GrailsApplication.ENV_DEVELOPMENT) {
-			response.sendError(404)
-		}
+//		if (GrailsUtil.environment != GrailsApplication.ENV_DEVELOPMENT) {
+//			response.sendError(404)
+//		}
 		//redirect(controller: "good", action: "list", params: params)
 	}
 	
     def signup_form = {
         // Display a page offering the appropriate options by default, but only in development!
-        if (GrailsUtil.environment != GrailsApplication.ENV_DEVELOPMENT) {
-            response.sendError(404)
-        }
+//        if (GrailsUtil.environment != GrailsApplication.ENV_DEVELOPMENT) {
+//            response.sendError(404)
+//        }
 		//redirect(controller: "good", action: "list", params: params)
     }
     
