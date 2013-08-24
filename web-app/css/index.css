@@ -88,7 +88,11 @@
 			
 			div#login {
 			  float: right;
+			  
+			 
+			  background: #abbf78;
 			}
+			
 			div#logout {
 			  text-align: left;
 			  border: none;

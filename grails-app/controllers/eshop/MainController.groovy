@@ -1,7 +1,7 @@
 package eshop
 
 import authentication.*
- 
+
 class MainController {
 
 	List products
@@ -13,16 +13,14 @@ class MainController {
 	}
 	
 	def authenticate = {
-		println params
-		def user = AuthenticationUser.findByLogin(session.user.login)
-		println user.login
+		def user = AuthenticationUser.findByLoginAndPassword(params.login, params.password)
 		if(user){
 		  session.user = user
-		  flash.message = "Hello ${user.login}!"
-		  redirect(controller:"main", action:"index")
+		  flash.message = "Hello ${user.name}!"
+		  redirect(controller:"maint", action:"index")
 		}else{
 		  flash.message = "Sorry, ${params.login}. Please try again."
-		  redirect(controller:"authentication", action:"login")
+		  redirect(controller:"authentication", action:"create")
 		}
 	  }
 

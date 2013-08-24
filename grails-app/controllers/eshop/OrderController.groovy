@@ -1,7 +1,5 @@
 package eshop
 
-import java.util.Date;
-
 import org.springframework.dao.DataIntegrityViolationException
 
 class OrderController {
@@ -27,37 +25,5 @@ class OrderController {
 
         [orderInstance: orderInstance]
     }
-	
-	def create = {
-		// create domain object
-		def o = new Order(
-			status:'0', 
-			orderDate: new Date(), 
-			requiredDate: new Date() + 30, 
-			paymentAmount: Basket.findById(session.user.id).basketCost,
-			shippedDate: null,
-			user:'${session.user}'
-		)
-		session.order = o
-		o.save()
-		if(o.save()) {
-			println "Order $o created!"
-		} else {
-			println "Order $o not created!"
-		}
-
-		redirect(controller:'main')
-	}
-	
-	def save() {
-		def basketInstance = new Basket(params)
-		if (!basketInstance.save(flush: true)) {
-			render(view: "create", model: [basketInstance: basketInstance])
-			return
-		}
-
-		flash.message = message(code: 'default.created.message', args: [message(code: 'basket.label', default: 'Basket'), basketInstance.id])
-		redirect(action: "show", id: basketInstance.id)
-	}
 
 }

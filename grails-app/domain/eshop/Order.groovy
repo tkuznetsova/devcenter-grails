@@ -1,11 +1,10 @@
 package eshop
 
 import java.util.Date
-import authentication.*
 
 class Order {
 	
-	static belongsTo = [user: AuthenticationUser]
+	static belongsTo = [user: User]
 	
 	static mapping = {
 		table 'orders'
@@ -22,7 +21,5 @@ class Order {
     static constraints = {
 		id blank: false, nullable: false, unique: true
 		paymentAmount blank: false, nullable: false
-		shippedDate  blank: true, nullable: true
-		status nullable: true
     }
 }

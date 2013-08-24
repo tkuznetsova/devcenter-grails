@@ -9,6 +9,9 @@ import org.springframework.context.ApplicationContextAware
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.RequestAttributes
 
+import eshop.BasketController
+import org.springframework.transaction.annotation.Transactional;
+
 class AuthenticationService {
 	
 	static final STATUS_NEW = 0
@@ -64,12 +67,35 @@ class AuthenticationService {
 			return authUser
 		}
 		
+		def name = params.name
+		def creditcardID = params.creditcardID 	  
+		def phone = params.phone
+		def addressline1 = params.addressline1
+		def addressline2 = params.addressline2
+		def city = params.city
+		def stateregion = params.stateregion
+		def postalcode = params.postalcode
+	    def country = params.country
+		def creditlimit = params.creditlimit
+		def role = params.role
+		
 		user = fireEvent('NewUserObject', login)
 		user.login = login
 		user.password = encodePassword(password)
 		user.email = email
 		user.status = STATUS_AWAITING_CONFIRMATION
-
+		
+		user.name = name
+		user.creditcardID = creditcardID
+		user.phone = phone
+		user.addressline1 = addressline1
+		user.addressline2 = addressline2
+		user.city = city
+		user.stateregion = stateregion
+		user.postalcode = postalcode
+		user.country = country
+		user.creditlimit = creditlimit
+		user.role = role
 		// See if confirmation required, onConfirmAccount will return true if so
 		if (!params.suppressConfirmation && fireEvent('ConfirmAccount', user)) {
 			logInImmediately = false // these are mutually exclusive settings
@@ -323,7 +349,8 @@ class AuthenticationService {
 	// as they cannot then refer to an injected prefs service
 	// The need to be static here to enable them to be used in domain class and command object
 	// validators
-	
+	//TODO: suppress hibernate.StaleObjectStateException on BasketController-AuthenticationController id interchanging
+	@Transactional(readOnly=true)
 	def checkLogin(def value) {
 		return fireEvent("ValidateLogin", value)
 	}

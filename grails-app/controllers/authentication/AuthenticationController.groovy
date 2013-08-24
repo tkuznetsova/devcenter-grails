@@ -12,7 +12,9 @@ class AuthenticationController {
 	def defaultAction = "index"
 	
 	def authenticationService
-
+	
+	def user
+	
     /**
      * Extract success_* and error_* into maps that can be passed to redirect(),
      * but forbidding the use of "url" which could lead to XSS attacks or phishing
@@ -34,42 +36,48 @@ class AuthenticationController {
     }
 	
 	def login_form = {
-		// Display a page offering the appropriate options by default, but only in development!
+//		// Display a page offering the appropriate options by default, but only in development!
 //		if (GrailsUtil.environment != GrailsApplication.ENV_DEVELOPMENT) {
 //			response.sendError(404)
 //		}
 		//redirect(controller: "good", action: "list", params: params)
 	}
-	
-    def signup_form = {
-        // Display a page offering the appropriate options by default, but only in development!
-//        if (GrailsUtil.environment != GrailsApplication.ENV_DEVELOPMENT) {
-//            response.sendError(404)
-//        }
-		//redirect(controller: "good", action: "list", params: params)
-    }
-    
+
 	def login = { LoginForm form ->
 	    def urls = extractParams()
 		
 		if (!form.hasErrors()) {
 			def loginResult = authenticationService.login( form.login, form.password)
-			if (loginResult.result == 0) {
-				flash.loginForm = form
-				if (log.debugEnabled) log.debug("Login succeeded for [${form.login}]")
-				if(params.login) {
-					def user = AuthenticationUser.findByLogin(params.login)
-					if(user){
-						session.user = user
-						println "${session.user.login}"
+			// suppress redirect(LinkedHashMap) errors on "No such user and" and "Password is incorrect" 
+			def userInstance = AuthenticationUser.findByLogin(form.login)
+			if(!userInstance) {
+				flash.message = message(code: 'default.not.registered.message')
+				redirect(controller: "main", action: "index")
+			} else {
+				if(userInstance.password != authenticationService.encodePassword(form.password)) {
+					flash.message = message(code: 'default.bad.password.message')
+					redirect(action: "login_form")
+				} else {
+			
+					if (loginResult.result == 0) {
+						flash.loginForm = form
+						if (log.debugEnabled) log.debug("Login succeeded for [${form.login}]")
+						
+						if(params.login) {
+							user = AuthenticationUser.findByLogin(params.login)
+							if(user){
+								session.user = user
+								println "${session.user.login}"
+							}
+						}
+						redirect(flash.authSuccessURL ? flash.authSuccessURL : urls.success)
+					} else {                  
+						flash.loginForm = form
+						flash.authenticationFailure = loginResult
+						if (log.debugEnabled) log.debug("Login failed for [${form.login}] - reason: ${loginResult.result}")
+						redirect(flash.authFailureURL ? flash.authFailureURL : urls.error)
 					}
 				}
-				redirect(flash.authSuccessURL ? flash.authSuccessURL : urls.success)
-			} else {                  
-				flash.loginForm = form
-				flash.authenticationFailure = loginResult
-				if (log.debugEnabled) log.debug("Login failed for [${form.login}] - reason: ${loginResult.result}")
-				redirect(flash.authFailureURL ? flash.authFailureURL : urls.error)
 			}
 		} else {
 			flash.loginForm = form
@@ -81,10 +89,22 @@ class AuthenticationController {
 
 	def signup = { SignupForm form ->
 	    def urls = extractParams()
-
+		
 		if (!form.hasErrors()) {
 			def signupResult = authenticationService.signup( login:form.login, 
-				password:form.password, email:form.email, immediate:true, extraParams:params)
+				password:form.password, email:form.email, 
+				name:form.name,
+				creditcardID:form.creditcardID,
+				phone:form.phone,
+				addressline1:form.addressline1,
+				addressline2:form.addressline2,
+				city:form.city,
+				stateregion:form.stateregion,
+				postalcode:form.postalcode,
+				country:form.country,
+				creditlimit:form.creditlimit,
+				role:form.role,
+				immediate:true, extraParams:params)
 			if ((signupResult.result == 0) || (signupResult.result == AuthenticatedUser.AWAITING_CONFIRMATION)) {
 				if (log.debugEnabled) {
 					if (signupResult == AuthenticatedUser.AWAITING_CONFIRMATION) {
@@ -93,13 +113,11 @@ class AuthenticationController {
 						log.debug("Signup succeeded for [${form.login}]")
 					}
 				}
+				// Basket insertion
 				if(params.login) {
-					def user = AuthenticationUser.findByLogin(params.login)
-					println '$user.login AuthenticationController signup says 1'
+					user = AuthenticationUser.findByLogin(params.login)
 					if(user){
 						session.user = user
-						println "${session.user.login} AuthenticationController signup says 2"
-						
 					}
 				}
 				redirect(flash.authSuccessURL ? flash.authSuccessURL : urls.success)
@@ -125,5 +143,28 @@ class AuthenticationController {
 		}
 		redirect(flash.authSuccessURL ? flash.authSuccessURL : urls.success)
 	}
+	
+	def findUser(id) {
+		def userInstance = new AuthenticationUser().find {session?.user?.id}
+		return userInstance
+	}
+	
+	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+	
+		def index() {
+			redirect(action: "list", params: params)
+		}
+	
+		def list(Integer max) {
+			params.max = Math.min(max ?: 10, 100)
+	println session?.user?.login
+			[userInstanceList: AuthenticationUser.findByLogin(session?.user?.login), userInstanceTotal: 1]
+		   // [userInstanceList: User.list(params), userInstanceTotal: User.count()]
+		}
+	
+		def create() {
+			[userInstance: new AuthenticationUser(params)]
+		}
+	
 }
 

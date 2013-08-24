@@ -20,77 +20,40 @@
 	</head>
 	<body>
 		<div id="grailsLogo" role="banner"><a href="http://grails.org"><img src="${resource(dir: 'images', file: 'shop_logo.png')}" alt="Grails"/></a>
-		
-		
-			<div id="login">
-				<auth:ifNotLoggedIn>
-				<p>
-					<g:link controller="authentication" action="login_form"><g:message code="default.clickhere.label"/>
-					<g:message code="default.login.label"/></g:link>
-					<g:message code="default.or.label"/>
-					<g:link controller="authentication" action="signup_form"><g:message code="default.register.label"/></g:link>
-				</p>
-				</auth:ifNotLoggedIn>
-			</div>
-			<auth:ifNotLoggedIn>
 				
-			<div id="login">
-			<div id="bag">	
-				<p>
-				<br><g:link controller="authentication" action="login_form"><g:message code="default.login.label"/>,</g:link><g:message code="default.shoppingbag.label"/>
-				</p>
-			</div>
-			</div>
-			</auth:ifNotLoggedIn>
-
-			<auth:ifLoggedIn>
-			<div id="login">
-				<div id="logout">
-					<table>
-						<tr>
-						<td><g:message code="default.hello.label"/> ${session?.user.login}</td>
-						<td><auth:form authAction="logout" success="[controller:'main', action:'index']" error="[controller:'authentication', action:'index']">
-						     <g:actionSubmit value="Log out"/>
-						</auth:form></td></tr>
-						</table>
-						<table>
-						<tr>
-						<td><g:link controller="basket" action="show" id="${session?.user.id}"><g:message code="default.bag.label"/></g:link>
-						(${session?.basket?.itemCount == null? 0 : session?.basket?.itemCount} <g:message code="default.items.label"/>)
-						</td></tr>
-					</table>
+			<auth:ifNotLoggedIn>					
+				
+				<div id="login">	
+					<g:link controller="authentication" action="login_form"><g:message code="default.login.label"/></g:link>
+					<g:link controller="authentication" action="create"><g:message code="default.register.label"/></g:link>
 				</div>
-			</div>
-			</auth:ifLoggedIn>
-		</div>
-	
+				
+			</auth:ifNotLoggedIn>
 		
-		<div class="nav" role="navigation">			
-			<ul>
-			<li><g:link class="home" controller="main" action="index"><g:message code="default.home.label"/></g:link>
-			</li>
-			<auth:ifLoggedIn>
-			<li><g:link controller="good" action="list"><g:message code="default.showproduct.label"/></g:link>
-			</li>
-			<li><g:link controller="category" action="list"><g:message code="default.showcategory.label"/></g:link>
-			</li>
-			<li><g:link controller="user" action="list"><g:message code="default.showuser.label"/></g:link>
-			</li>
-			<li><g:link controller="order" action="list"><g:message code="default.showorder.label"/></g:link></li>
+			<auth:ifLoggedIn>	
+							
+				<g:message code="default.hello.label"/> ${session?.user?.login}!		
+				<div id="login">
+				
+					<auth:form authAction="logout" success="[controller:'main', action:'index']" error="[controller:'authentication', action:'index']">
+						<g:link class="basket" controller="basket" action="show" id="${session?.user?.id}"><g:message code="default.bag.label"/>
+						(${session?.basket?.itemCount == null? 0 : session?.basket?.itemCount}<g:message code="default.items.label"/>)</g:link>
+						<g:actionSubmit value="Log out"/>					    
+					</auth:form>
+						
+					</div>
+			
 			</auth:ifLoggedIn>
-			</ul>
-		</div>
+		
+	</div>
+
 		<!-- END #nav -->
 
 		<div id="content">
 			<g:layoutBody />
 		</div>
 		<!-- END #content -->
-		<div class="buttons">
-		<ul>
-			<g:link controller="main" action="index"><g:message code="default.home.label"/></g:link>
-		</ul>
-		</div>
+		
 	<div class="footer" role="contentinfo">
 		
 	</div>

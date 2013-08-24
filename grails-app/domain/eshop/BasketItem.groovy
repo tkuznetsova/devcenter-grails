@@ -1,12 +1,11 @@
 package eshop
 
 import java.util.Date
-import authentication.*
 
 class BasketItem {
 	
 	static hasMany = [good: Good]	
-	static belongsTo = [user: AuthenticationUser, basket: Basket, good: Good, order: Order]
+	static belongsTo = [user: User, basket: Basket, good: Good, order: Order]
 	
 	Long id
 	int quantity

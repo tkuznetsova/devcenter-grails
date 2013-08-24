@@ -8,12 +8,11 @@ class Basket implements Serializable {
 	static hasMany = [purchase: BasketItem]
 	static belongsTo = [user: AuthenticationUser]
 	
-	Long id
 	int itemCount
 	Double basketCost 
 	
     static constraints = {
-		id blank: false, nullable: false, unique: true 
+		user blank: true, nullable: true // cannot do a new AuthenticationUser from BasketController
 		basketCost nullable: true
 		itemCount nullable: true 
 		purchase blank: true, nullable: true

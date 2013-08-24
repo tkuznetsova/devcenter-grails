@@ -1,7 +1,6 @@
 package eshop
 
 import org.springframework.dao.DataIntegrityViolationException
-import authentication.*
 
 class BasketController {
 
@@ -11,26 +10,19 @@ class BasketController {
         redirect(action: "list", params: params)
     }
 
-	def create() {
+	def create = {
 		// create domain object
-		def basketInstance = new Basket(params)
-	println params
-		def user = AuthenticationUser.findByLogin(params.userLogin)
-		params.user = user
-		params.userId = user.id
-		params.basketCost=0.0
-		params.itemCount=0
-	println params
-		basketInstance.properties = params
-		basketInstance.version = 1
-	println basketInstance.properties
-		if(basketInstance.save(flush: true)) {
-			println "Basket $basketInstance created!"
+		def b = new Basket(basketCost:'0', itemCount:'0', id:'${session.user.id}')
+		b.user = session.user
+		session.basket = b
+		b.save()
+		if(b.save()) {
+			println "Basket $b created!"
 		} else {
-			println "Basket $basketInstance not created!"
+			println "Basket $b not created!"
 		}
-		return
-		//redirect(controller:"main", action:"index")
+
+		redirect(controller:'main')
 	}
 	
 	def save() {
@@ -52,7 +44,7 @@ class BasketController {
 	def show(Long id) {
 		println params
 		Basket basketInstance = Basket.get(params.id)
-		//println basketInstance?.user?.login
+		println basketInstance.user.name
 		if (!basketInstance) {
 			flash.message = message(code: 'default.not.found.message', args: [message(code: 'basket.label', default: 'Basket'), id])
 			redirect(action: "list")
@@ -125,15 +117,24 @@ class BasketController {
         }
     }
 	
-	 def addPurchase(Long id) {
-		println params
-		BasketItem p = BasketItem.get(id)
-		def b = Basket.get(session.user.id).addToPurchase(p).save()
-
-		b.itemCount += 1
+	def addPurchase(Long id) {
+		BasketItem p = BasketItem.addToBasket( id )
+		println "${p.good.price}"
+		
+		def b = Basket.get(session.user.id)
+		.addToPurchase(p)
+		.save()
+		
+		// Add one more item
+		b.itemCount += p.quantity
+		p.cost = p.good.price * p.quantity
+		// Add the price of product
 		b.basketCost += p.cost
-
-		session.basket = b	
+		
+		session.basket = b
+		println "Count 1: ${b.count()}"
+		println "Count 2: ${b.itemCount}"
+		
 		if (p.save()) {
 		println "Purchase added to the basket"
 		redirect(controller:"basket", action:"show", id:"${session.user.id}")
@@ -142,29 +143,45 @@ class BasketController {
 		println "Purchase NOT added to the basket"
 		redirect(controller:"basket", action:"show", id:"${session.user.id}")
 		}
-	}
-	
-	def removePurchase(Long id) {
-		println params
-		def p = BasketItem.get(id)			
-		Basket b = Basket.get(session.user.id)
-
-		b.itemCount -= p.quantity
-		b.basketCost -= p.cost
-		if (b.basketCost < 0)
-			b.basketCost = 0
-		if (b.itemCount < 0)
-			b.itemCount = 0
+		}
+		
+		def removePurchase(Long id) {
+			println params
+			def p = BasketItem.get( id )
+			//println "${p.good.name}"
 			
-		b.removeFromPurchase(p).save()		
-		p.delete()
-		session.basket = b
-		if (p.save()) {
-			redirect(controller:"basket", action:"show", id:"${session.user.id}")
-		}
-		else {
-		redirect(controller:"basket", action:"show", id:"${session.user.id}")
-		}
-	}
+			Basket b = Basket.get(session.user.id)
+println b.basketCost
+println b.itemCount
+			// Delete one entire nomenclature
+			b.itemCount -= p.quantity
+println p.quantity
+println p.cost
 
+			// Delete the price of product
+			b.basketCost -= p.cost
+println b.basketCost
+
+			
+			// The price cannot be less than 0
+			if (b.basketCost < 0)
+				b.basketCost = 0
+			if (b.itemCount < 0)
+				b.itemCount = 0
+				
+			b.removeFromPurchase(p)
+			.save()
+			
+			p.delete()
+			session.basket = b
+			println "Count 1: ${b.count()}"
+			println "Count 2: ${b.itemCount}"
+println b.basketCost
+			if (p.save()) {
+			redirect(controller:"basket", action:"show", id:"${session.user.id}")
+			}
+			else {
+			redirect(controller:"basket", action:"show", id:"${session.user.id}")
+			}
+		}
 }
