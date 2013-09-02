@@ -1,7 +1,7 @@
 package authentication
 
 class AuthenticationUser { 
-String login
+	String login
 	String password
 	String email
 	int status = AuthenticationService.STATUS_NEW

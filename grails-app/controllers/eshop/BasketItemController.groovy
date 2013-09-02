@@ -1,5 +1,6 @@
 package eshop
 
+import authentication.AuthenticationController
 import org.springframework.dao.DataIntegrityViolationException
 
 class BasketItemController {
@@ -21,31 +22,7 @@ class BasketItemController {
         [basketItemInstance: new BasketItem(params)]
     }
 	
-	def addToBasket (Long id) {		
-		// create domain object and assign parameters using data binding
-		def product = Good.get( id )
-		println "${product.name}"
-
-		def p = new BasketItem(quantity:'1')
-		p.user = session.user
-		p.cost = product.price
-		p.good = product
-		p.save()
-
-		if(p.save()) {
-			println "Product $p.id created!"
-			println "Product $p.user created!"
-			println "Product $p.cost created!"
-			println "Product $p.quantity created!"
-			println "Product $p.good created!"
-			redirect(controller:"basket",action:"addPurchase", id: p.id)
-
-		} else {
-			println "Product $p not added!"
-			redirect(controller:"good")
-		}
-
-	}
+	
 
     def save() {
         def basketItemInstance = new BasketItem(params)
@@ -128,40 +105,78 @@ class BasketItemController {
         }
     }
 	
-		def addOne = {
-			BasketItem p = BasketItem.get( params.id )
-			p.cost = p.cost + p.good.price
-			p.quantity += 1
+	def addPurchase (Long id) {
+		def basketItemInstance = new BasketItem(quantity:'1')
+		if(basketItemInstance) {
+			println "BaskItemController-addToBasket says basketItemInstance is created for ${session.user.login}: ${session.user}"
+		}
+		// create domain objects and assign parameters using data binding
+		def product = new GoodController().findGood( id )
+		if(product) {
+			println "${product.name}"
+			basketItemInstance.good = product
+			basketItemInstance.cost = product.price
+		}
+		def userInstance = new AuthenticationController().findUser(session?.user?.id)
+		if(userInstance) {
+			basketItemInstance.user = userInstance
+		}
+		def basketInstance = new BasketController().findBasket( session?.user?.basketId )
+		if(basketInstance) {
+			basketItemInstance.basket = basketInstance
+		}
+		if(basketItemInstance.save(flush: true)) {
+			println "Product $basketItemInstance.id created!"
+			println "Product $basketItemInstance.user created!"
+			println "Product $basketItemInstance.cost created!"
+			println "Product $basketItemInstance.quantity created!"
+			println "Product $basketItemInstance.good created!"
+			redirect(controller:"basket", action:"addToBasket", id: basketItemInstance.id)
+		} else {
+			println "Product $basketItemInstance not added!"
+			redirect(controller:"good")
+		}
+	}
+	
+	def addOne = {
+		BasketItem p = BasketItem.get( params.id )
+		p.cost = p.cost + p.good.price
+		p.quantity += 1
+		p.save()
+		
+		Basket b = Basket.get(session.user.id).save()
+
+		// Add one more item
+		b.itemCount += 1
+		// Add the price of product
+		b.basketCost += p.good.price
+
+		session.basket = b
+		redirect(controller:"basket", action:"show", id:"${session.user.id}")
+	}
+	
+	def removeOne = {
+		BasketItem p = BasketItem.get( params.id )
+		if (p.quantity == 1) {
+			redirect(controller:"basket", action:"removePurchase", id:"${p.id}")
+		}
+		else {
+			p.cost = p.cost - p.good.price
+			p.quantity -= 1
 			p.save()
 			
 			Basket b = Basket.get(session.user.id).save()
 	
-			// Add one more item
-			b.itemCount += 1
-			// Add the price of product
-			b.basketCost += p.good.price
+			b.itemCount -= 1
+			b.basketCost -= p.good.price
 	
 			session.basket = b
 			redirect(controller:"basket", action:"show", id:"${session.user.id}")
 		}
-		
-		def removeOne = {
-			BasketItem p = BasketItem.get( params.id )
-			if (p.quantity == 1) {
-				redirect(controller:"basket", action:"removePurchase", id:"${p.id}")
-			}
-			else {
-				p.cost = p.cost - p.good.price
-				p.quantity -= 1
-				p.save()
-				
-				Basket b = Basket.get(session.user.id).save()
-		
-				b.itemCount -= 1
-				b.basketCost -= p.good.price
-		
-				session.basket = b
-				redirect(controller:"basket", action:"show", id:"${session.user.id}")
-			}
-		}
+	}
+	
+	def findBasketItem(id) {
+		def basketItemInstance = new BasketItem().find {id}
+		return basketItemInstance
+	}
 }

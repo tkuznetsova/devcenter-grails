@@ -12,9 +12,11 @@
 		<a href="#show-basket" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
 		<div class="nav" role="navigation">
 			<ul>
-				
-				<li><g:link class="list" action="list"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
-				
+			<li><g:link class="home" controller="main" action="index"><g:message code="default.home.label"/></g:link></li>
+			<li><g:link controller="basket" action="order">
+					${message(code: 'basket.order.label', default: 'Check out order')}
+				</g:link></li>
+			
 			</ul>
 		</div>
 		<div id="show-basket" class="content scaffold-show" role="main">
@@ -25,13 +27,13 @@
 			<table>
 			<thead>
 				<tr>
-					<g:sortableColumn property="id" title="ID" />
-					<g:sortableColumn property="name" title="Name" />
-					<g:sortableColumn property="manufacturer" title="Manufacturer" />
-					<g:sortableColumn property="characteristics" title="Characteristics" />
-					<g:sortableColumn property="price" title="Price" />
-					<g:sortableColumn property="quantity" title="Quantity" />
-					<g:sortableColumn property="cost" title="Total Price" />
+					<g:sortableColumn property="id" title="${message(code: 'basket.id.label', default: 'ID')}" />
+					<g:sortableColumn property="name" title="${message(code: 'basket.name.label', default: 'Name')}" />
+					<g:sortableColumn property="manufacturer" title="${message(code: 'basket.manufacturer.label', default: 'Manufacturer')}" />
+					<g:sortableColumn property="characteristics" title="${message(code: 'basket.characteristics.label', default: 'Characteristics')}" />
+					<g:sortableColumn property="price" title="${message(code: 'basket.price.label', default: 'Price')}" />
+					<g:sortableColumn property="quantity" title="${message(code: 'basket.quantity.label', default: 'Quantity')}" />
+					<g:sortableColumn property="cost" title="${message(code: 'basket.cost.label', default: 'Total Price')}" />
 					<th><g:message code="" default="" /></th>
 				</tr>
 			</thead>
@@ -68,31 +70,31 @@
 							${purchase.cost}
 						</td>
 						<td><g:remoteLink controller="basket" action="removePurchase"
-								id="${purchase.id}">Remove product
+								id="${purchase.id}">${message(code: 'basket.removeProduct.label', default: 'Remove product')}
 							</g:remoteLink>
 						</td>
 					</tr>
 				</g:each>
 			</tbody>
 		</table>
-		<p>
-			<strong>Total items:</strong>
-			${basketInstance.itemCount}
-			| <strong>Total Price:</strong>
-			${basketInstance.basketCost}
-			Euros
-
-			<g:link controller="order" action="create">Click here to check out your order</g:link>
-
-		</p>
+		
 	</div>
 
-			<g:form>
-				<fieldset class="buttons">
-					<g:hiddenField name="id" value="${basketInstance?.id}" />
-					
-				</fieldset>
-			</g:form>
+		<g:form>
+			<fieldset class="buttons">
+				<g:hiddenField name="id" value="${basketInstance?.id}" />
+				
+			</fieldset>
+		</g:form>
+		
+		<p>
+			<strong>${message(code: 'basket.totalItems.label', default: 'Total items:')}</strong>
+			${basketInstance.itemCount}
+			| <strong>${message(code: 'basket.totalPrice.label', default: 'Total Price:')}</strong>
+			${basketInstance.basketCost}
+			${message(code: 'basket.euros.label', default: 'Euros')}
+
+		</p>
 
 	</body>
 </html>

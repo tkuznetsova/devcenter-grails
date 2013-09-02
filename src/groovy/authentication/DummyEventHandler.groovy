@@ -3,8 +3,8 @@ package authentication
 class DummyEventHandler {
     def onValidateLogin( loginID ) {  }
     def onValidatePassword( password ) { }
-    def onEncodePassword( password ) {  }
-    def onFindByLogin( loginID ) {  }
+    def onEncodePassword( password ) { }
+    def onFindByLogin( loginID ) {	}
     def onNewUserObject( loginID ) {  }
     def onSaveUser( user ) {  }
     def onLoggedIn( AuthenticatedUser login ) { }
@@ -15,5 +15,6 @@ class DummyEventHandler {
     def onConfirmAccount( user ) { }    
     def onHasAuthorization( params ) { }    
     def onCheckAuthorized( params ) { }    
-    def onUnauthorizedAccess( params ) { }    
+    def onUnauthorizedAccess( params ) { } 		
+		
 }

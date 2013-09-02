@@ -15,14 +15,15 @@
 		<g:message code="category.parent.label" default="Parent" />
 		
 	</label>
+	
 	<g:if test="${eshop.Category.list()}">
-	<g:select id="parent" name="name" from="${eshop.Category.list()}" optionKey="id" optionValue="name" value="${categoryInstance?.parent?.id}" class="many-to-one" noSelection=""/>
+	<g:select id="name" name="parent.id" from="${eshop.Category.list()}" optionKey="id" optionValue="name" value="${categoryInstance?.parent?.name}" class="many-to-one"/>
 	</g:if>
 </div>
 
 <div class="fieldcontain ${hasErrors(bean: categoryInstance, field: 'description', 'error')} ">
 	<label for="description">
-		<g:message code="good.description.label" default="Description" />
+		<g:message code="index.description.label" default="Description" />
 		
 	</label>
 	<g:textField name="description" maxlength="20" value="${categoryInstance?.description}"/>
@@ -30,7 +31,7 @@
 
 <div class="fieldcontain ${hasErrors(bean: categoryInstance, field: 'good', 'error')} ">
 	<label for="good">
-		<g:message code="category.good.label" default="Good" />
+		<g:message code="default.showproduct.label" default="Good" />
 		
 	</label>
 	

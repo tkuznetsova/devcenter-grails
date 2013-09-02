@@ -32,19 +32,22 @@
 	<g:datePicker name="shippedDate" precision="day"  value="${orderInstance?.shippedDate}"  />
 </div>
 
-<div class="fieldcontain ${hasErrors(bean: orderInstance, field: 'status', 'error')} required">
+<div class="fieldcontain ${hasErrors(bean: orderInstance, field: 'status', 'error')} ">
 	<label for="status">
 		<g:message code="order.status.label" default="Status" />
-		<span class="required-indicator">*</span>
+		<span class="required-indicator"></span>
 	</label>
-	<g:field name="status" type="number" value="${orderInstance.status}" required=""/>
+	<g:if test="${orderInstance?.status} == 0" >
+		<g:message code="order.status.new.label" default="New" />
+	</g:if>
+	<g:else><g:message code="order.status.shipped.label" default="Shipped" /></g:else>
 </div>
 
-<div class="fieldcontain ${hasErrors(bean: orderInstance, field: 'user', 'error')} required">
-	<label for="user">
+<div class="fieldcontain ${hasErrors(bean: orderInstance, field: 'authentication', 'error')} required">
+	<label for="authentication">
 		<g:message code="order.user.label" default="User" />
 		<span class="required-indicator">*</span>
 	</label>
-	<g:select id="user" name="user.id" from="${eshop.User.list()}" optionKey="id" required="" value="${orderInstance?.user?.id}" class="many-to-one"/>
+	<g:field name="name" type="id" value="${orderInstance?.authentication?.name}" required=""/>
 </div>
 

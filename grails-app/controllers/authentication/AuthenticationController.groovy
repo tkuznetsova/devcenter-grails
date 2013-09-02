@@ -2,6 +2,7 @@ package authentication
 
 import grails.util.GrailsUtil
 import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.springframework.dao.DataIntegrityViolationException
 
 import authentication.LoginForm
 import authentication.SignupForm
@@ -45,10 +46,11 @@ class AuthenticationController {
 
 	def login = { LoginForm form ->
 	    def urls = extractParams()
-		
+		def dummyEvent = new DummyEventHandler()
 		if (!form.hasErrors()) {
 			def loginResult = authenticationService.login( form.login, form.password)
-			// suppress redirect(LinkedHashMap) errors on "No such user and" and "Password is incorrect" 
+			
+			// TODO: DONE suppress redirect(LinkedHashMap) errors on "No such user" and "Password is incorrect" 
 			def userInstance = AuthenticationUser.findByLogin(form.login)
 			if(!userInstance) {
 				flash.message = message(code: 'default.not.registered.message')
@@ -58,19 +60,18 @@ class AuthenticationController {
 					flash.message = message(code: 'default.bad.password.message')
 					redirect(action: "login_form")
 				} else {
-			
 					if (loginResult.result == 0) {
 						flash.loginForm = form
 						if (log.debugEnabled) log.debug("Login succeeded for [${form.login}]")
-						
 						if(params.login) {
-							user = AuthenticationUser.findByLogin(params.login)
+							user = AuthenticationUser.find{params.login}
 							if(user){
 								session.user = user
-								println "${session.user.login}"
 							}
 						}
 						redirect(flash.authSuccessURL ? flash.authSuccessURL : urls.success)
+						
+						
 					} else {                  
 						flash.loginForm = form
 						flash.authenticationFailure = loginResult
@@ -79,6 +80,7 @@ class AuthenticationController {
 					}
 				}
 			}
+			
 		} else {
 			flash.loginForm = form
 			flash.loginFormErrors = form.errors // Workaround for grails bug 
@@ -118,6 +120,17 @@ class AuthenticationController {
 					user = AuthenticationUser.findByLogin(params.login)
 					if(user){
 						session.user = user
+						def basketInstance = new BasketController().create(session.user.id)
+						println " AuthenticationController-signup says ${basketInstance.id}"
+						def basketInstance_ = new BasketController().findBasket(basketInstance.id)
+						if(basketInstance_) {
+							user.basketId = basketInstance_.id
+							
+							println " AuthenticationController-signup says_ ${basketInstance_.id}"
+						}else {
+							println "${session.user.login} AuthenticationController-signup says basketInstance uncreated"
+						}
+						//redirect(controller:"basket", action:"create", params: [userLogin: "${session.user.login}", success_url: "${urls.success}"])
 					}
 				}
 				redirect(flash.authSuccessURL ? flash.authSuccessURL : urls.success)
@@ -151,20 +164,102 @@ class AuthenticationController {
 	
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 	
-		def index() {
-			redirect(action: "list", params: params)
-		}
+	def index() {
+		redirect(action: "list", params: params)
+	}
+
+	def list(Integer max) {
+		params.max = Math.min(max ?: 10, 100)
+println session?.user?.login
+		[userInstanceList: AuthenticationUser.findByLogin(session?.user?.login), userInstanceTotal: 1]
+	   // [userInstanceList: User.list(params), userInstanceTotal: User.count()]
+	}
+
+	def create() {
+		[userInstance: new AuthenticationUser(params)]
+	}
+
+	def save() {
+		params.authentication = AuthenticationUser.findByLogin(session?.user?.login)
+		def userInstance = new AuthenticationUser(params)
 	
-		def list(Integer max) {
-			params.max = Math.min(max ?: 10, 100)
-	println session?.user?.login
-			[userInstanceList: AuthenticationUser.findByLogin(session?.user?.login), userInstanceTotal: 1]
-		   // [userInstanceList: User.list(params), userInstanceTotal: User.count()]
+		if (!userInstance.save(flush: true)) {
+			render(view: "create", model: [userInstance: userInstance])
+			return
 		}
-	
-		def create() {
-			[userInstance: new AuthenticationUser(params)]
+
+		flash.message = message(code: 'default.created.message', args: [message(code: 'user.label', default: 'User'), userInstance.id])
+		redirect(action: "show", id: userInstance.id)
+	}
+
+	def show(Long id) {
+		def userInstance = AuthenticationUser.get(id)
+		if (!userInstance) {
+			flash.message = message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), id])
+			redirect(action: "list")
+			return
 		}
-	
+
+		[userInstance: userInstance]
+	}
+
+	def edit(Long id) {
+		def userInstance = AuthenticationUser.get(id)
+		if (!userInstance) {
+			flash.message = message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), id])
+			redirect(action: "list")
+			return
+		}
+
+		[userInstance: userInstance]
+	}
+
+	def update(Long id, Long version) {
+		def userInstance = AuthenticationUser.get(id)
+		if (!userInstance) {
+			flash.message = message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), id])
+			redirect(action: "list")
+			return
+		}
+
+		if (version != null) {
+			if (userInstance.version > version) {
+				userInstance.errors.rejectValue("version", "default.optimistic.locking.failure",
+						  [message(code: 'user.label', default: 'User')] as Object[],
+						  "Another user has updated this User while you were editing")
+				render(view: "edit", model: [userInstance: userInstance])
+				return
+			}
+		}
+
+		userInstance.properties = params
+
+		if (!userInstance.save(flush: true)) {
+			render(view: "edit", model: [userInstance: userInstance])
+			return
+		}
+
+		flash.message = message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), userInstance.id])
+		redirect(action: "show", id: userInstance.id)
+	}
+
+	def delete(Long id) {
+		def userInstance = AuthenticationUser.get(id)
+		if (!userInstance) {
+			flash.message = message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), id])
+			redirect(action: "list")
+			return
+		}
+
+		try {
+			userInstance.delete(flush: true)
+			flash.message = message(code: 'default.deleted.message', args: [message(code: 'user.label', default: 'User'), id])
+			redirect(action: "list")
+		}
+		catch (DataIntegrityViolationException e) {
+			flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'user.label', default: 'User'), id])
+			redirect(action: "show", id: id)
+		}
+	}
 }
 

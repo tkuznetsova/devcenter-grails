@@ -99,4 +99,10 @@ class GoodController {
             redirect(action: "show", id: id)
         }
     }
+	
+	def findGood(id) {
+		def goodInstance = new Good().get(id)
+		return goodInstance
+	}
+	
 }

@@ -4,7 +4,7 @@
 
 <div class="fieldcontain ${hasErrors(bean: goodInstance, field: 'name', 'error')} required">
 	<label for="title">
-		<g:message code="good.title.label" default="Title" />
+		<g:message code="index.name.label" default="Title" />
 		<span class="required-indicator">*</span>
 	</label>
 	<g:textField name="name" maxlength="20" required="" value="${goodInstance?.name}"/>
@@ -49,4 +49,12 @@
 	</label>
 	<g:select id="name" name="category.id" from="${eshop.Category.list()}" optionKey="id" optionValue="name" required="" value="${goodInstance?.category?.name}" class="many-to-one"/>
 </div>
+
+<g:uploadForm action="upload">
+	Good Title:<g:select name="name" from="${goodInstanceList}" optionKey="id" optionValue="name" />
+	<p/>
+	Photo: <input name="photo" type="file" />
+	<g:submitButton name="upload" value="Upload"/>
+</g:uploadForm>
+
 

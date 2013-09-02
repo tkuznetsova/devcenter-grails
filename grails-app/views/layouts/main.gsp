@@ -37,7 +37,7 @@
 				
 					<auth:form authAction="logout" success="[controller:'main', action:'index']" error="[controller:'authentication', action:'index']">
 						<g:link class="basket" controller="basket" action="show" id="${session?.user?.id}"><g:message code="default.bag.label"/>
-						(${session?.basket?.itemCount == null? 0 : session?.basket?.itemCount}<g:message code="default.items.label"/>)</g:link>
+						(${basketInstance?.itemCount ?: ''}<g:message code="default.items.label"/>)</g:link>
 						<g:actionSubmit value="Log out"/>					    
 					</auth:form>
 						

@@ -18,9 +18,7 @@
 		</div>
 		<div id="show-order" class="content scaffold-show" role="main">
 			<h1><g:message code="default.show.label" args="[entityName]" /></h1>
-			<g:if test="${flash.message}">
-			<div class="message" role="status">${flash.message}</div>
-			</g:if>
+			
 			<ol class="property-list order">
 			
 				<g:if test="${orderInstance?.id}">
@@ -77,11 +75,11 @@
 				</li>
 				</g:if>
 			
-				<g:if test="${orderInstance?.user}">
+				<g:if test="${orderInstance?.authentication}">
 				<li class="fieldcontain">
 					<span id="user-label" class="property-label"><g:message code="order.user.label" default="User" /></span>
 					
-						<span class="property-value" aria-labelledby="user-label"><g:link controller="user" action="show" id="${orderInstance?.user?.id}">${orderInstance?.user?.encodeAsHTML()}</g:link></span>
+						<span class="property-value" aria-labelledby="user-label"><g:link controller="authentication" action="show" id="${orderInstance?.authentication?.id}">${orderInstance?.authentication?.encodeAsHTML()}</g:link></span>
 					
 				</li>
 				</g:if>

@@ -1,28 +1,46 @@
 package eshop
 
+import authentication.AuthenticationController
 import org.springframework.dao.DataIntegrityViolationException
 
 class BasketController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
-    def index() {
-        redirect(action: "list", params: params)
+    def index() {	
+        redirect(action: "show", params: params)
     }
 
-	def create = {
-		// create domain object
-		def b = new Basket(basketCost:'0', itemCount:'0', id:'${session.user.id}')
-		b.user = session.user
-		session.basket = b
-		b.save()
-		if(b.save()) {
-			println "Basket $b created!"
-		} else {
-			println "Basket $b not created!"
+	def create(id) {
+		def basketInstance = new Basket(params)
+		params.basketCost=0.0
+		params.itemCount=0
+		basketInstance.properties = params
+		basketInstance.version = 1	
+		
+		def userInstance = new AuthenticationController().findUser(id)
+		basketInstance.user = userInstance
+		println "${session.user.login} AuthenticationController-signup says user not found"
+		if(basketInstance.save()) {
+		
+		}else {
+			println "${session.user.login} AuthenticationController-signup-Basket-create says basketInstance unsaved"
 		}
-
-		redirect(controller:'main')
+		return basketInstance
+	}
+	
+	def findBasket(id) {
+		def basketInstance = new Basket().find {id}
+		return basketInstance 
+	}
+	
+	def order() {		
+		def basketInstance = Basket.get(session.user.basketId)
+		def orderInstance = new OrderController().create(params: [payment: "${basketInstance.basketCost}"])
+		if(!orderInstance) {
+			println "OrderControlle-order says: order creation fails"
+		}
+		redirect(controller: "order", action: "show")
 	}
 	
 	def save() {
@@ -34,11 +52,6 @@ class BasketController {
 
 		flash.message = message(code: 'default.created.message', args: [message(code: 'basket.label', default: 'Basket'), basketInstance.id])
 		redirect(action: "show", id: basketInstance.id)
-	}
-
-	def list(Integer max) {
-		params.max = Math.min(max ?: 10, 100)
-		[basketInstanceList: Basket.list(params), basketInstanceTotal: Basket.count()]
 	}
 	
 	def show(Long id) {
@@ -117,38 +130,30 @@ class BasketController {
         }
     }
 	
-	def addPurchase(Long id) {
-		BasketItem p = BasketItem.addToBasket( id )
-		println "${p.good.price}"
+	def addToBasket(Long id) {
+		def basketInstance = Basket.get(session.user.basketId)
+		def purchase = new BasketItemController().findBasketItem(id)		
 		
-		def b = Basket.get(session.user.id)
-		.addToPurchase(p)
-		.save()
+		basketInstance.itemCount += purchase.quantity
+		basketInstance.basketCost += purchase.cost
 		
-		// Add one more item
-		b.itemCount += p.quantity
-		p.cost = p.good.price * p.quantity
-		// Add the price of product
-		b.basketCost += p.cost
+		println "Count 1: ${basketInstance.count()}"
+		println "Count 2: ${basketInstance.itemCount}"
 		
-		session.basket = b
-		println "Count 1: ${b.count()}"
-		println "Count 2: ${b.itemCount}"
-		
-		if (p.save()) {
-		println "Purchase added to the basket"
-		redirect(controller:"basket", action:"show", id:"${session.user.id}")
+		if (purchase.save(flush: true)) {
+		println "Purchase is added to the basket"
+		redirect(controller:"basket", action:"show", id:"${session.user.basketId}")
 		}
 		else {
 		println "Purchase NOT added to the basket"
-		redirect(controller:"basket", action:"show", id:"${session.user.id}")
+		redirect(controller:"basket", action:"show", id:"${session.user.basketId}")
 		}
-		}
+	}
 		
-		def removePurchase(Long id) {
-			println params
-			def p = BasketItem.get( id )
-			//println "${p.good.name}"
+	def removePurchase(Long id) { // fromBasket
+		println params
+		def p = BasketItem.get( id )
+		//println "${p.good.name}"
 			
 			Basket b = Basket.get(session.user.id)
 println b.basketCost
@@ -164,24 +169,24 @@ println b.basketCost
 
 			
 			// The price cannot be less than 0
-			if (b.basketCost < 0)
-				b.basketCost = 0
-			if (b.itemCount < 0)
-				b.itemCount = 0
-				
-			b.removeFromPurchase(p)
-			.save()
+		if (b.basketCost < 0)
+			b.basketCost = 0
+		if (b.itemCount < 0)
+			b.itemCount = 0
 			
-			p.delete()
-			session.basket = b
-			println "Count 1: ${b.count()}"
-			println "Count 2: ${b.itemCount}"
+		b.removeFromPurchase(p)
+		.save()
+		
+		p.delete()
+		session.basket = b
+		println "Count 1: ${b.count()}"
+		println "Count 2: ${b.itemCount}"
 println b.basketCost
 			if (p.save()) {
 			redirect(controller:"basket", action:"show", id:"${session.user.id}")
-			}
-			else {
-			redirect(controller:"basket", action:"show", id:"${session.user.id}")
-			}
 		}
+		else {
+		redirect(controller:"basket", action:"show", id:"${session.user.id}")
+		}
+	}
 }

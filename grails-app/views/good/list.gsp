@@ -12,7 +12,7 @@
 		<auth:ifLoggedIn>
 		<div class="nav" role="navigation">
 			<ul>
-				
+				<li><g:link class="home" controller="main" action="index"><g:message code="default.home.label"/></g:link></li>
 				<li><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></li>
 			</ul>
 		</div>
@@ -42,8 +42,7 @@
 				<g:each in="${goodInstanceList}" status="i" var="goodInstance">
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 					
-						<td><g:remoteLink controller="basketItem" action="addToBasket"
-								id="${goodInstance.id}">Add to basket
+						<td><g:remoteLink controller="basketItem" action="addPurchase" id="${goodInstance.id}"><g:message code="good.addToBasket.label"/>
 							</g:remoteLink>
 						</td>
 					
