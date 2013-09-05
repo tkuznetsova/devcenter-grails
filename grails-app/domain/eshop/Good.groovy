@@ -4,6 +4,8 @@ class Good {
 	
 	static belongsTo = [category: Category]
 		
+	static searchable = true
+	
 	Long id;
 	String name;
 	Category category;

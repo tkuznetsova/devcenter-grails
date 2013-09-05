@@ -9,7 +9,7 @@ import org.springframework.context.ApplicationContextAware
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.RequestAttributes
 
-import eshop.BasketController
+import eshop.*
 import org.springframework.transaction.annotation.Transactional;
 
 class AuthenticationService {

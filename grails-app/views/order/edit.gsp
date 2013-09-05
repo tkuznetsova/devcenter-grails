@@ -31,7 +31,35 @@
 				<g:hiddenField name="id" value="${orderInstance?.id}" />
 				<g:hiddenField name="version" value="${orderInstance?.version}" />
 				<fieldset class="form">
-					<g:render template="form"/>
+					<div class="fieldcontain ${hasErrors(bean: orderInstance, field: 'requiredDate', 'error')} required">
+						<label for="requiredDate">
+							<g:message code="order.requiredDate.label" default="Required Date" />
+							<span class="required-indicator">*</span>
+						</label>
+						<g:datePicker name="requiredDate" precision="day"  value="${orderInstance?.requiredDate}"  />
+					</div>
+					
+					<div class="fieldcontain ${hasErrors(bean: orderInstance, field: 'shippedDate', 'error')} required">
+						<label for="shippedDate">
+							<g:message code="order.shippedDate.label" default="Shipped Date" />
+							<span class="required-indicator">*</span>
+						</label>
+						<g:datePicker name="shippedDate" precision="day"  value="${orderInstance?.shippedDate}"  />
+					</div>
+					
+					<div class="fieldcontain ${hasErrors(bean: orderInstance, field: 'status', 'error')} ">
+						<label for="status">
+							<g:message code="order.status.label" default="Status" />
+							<span class="required-indicator"></span>
+						</label>
+	
+						<select name="${orderInstance?.status}">
+							<option value="0"><g:message code="order.status.new.label" default="New"/></option>
+							<option value="1"><g:message code="order.status.waiting.label" default="Waiting"/></option>
+							<option value="2"><g:message code="order.status.paid.label" default="Paid"/></option>
+							<option value="3"><g:message code="order.status.shipped.label" default="Shipped"/></option>
+						</select>
+					</div>
 				</fieldset>
 				<fieldset class="buttons">
 					<g:actionSubmit class="save" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />

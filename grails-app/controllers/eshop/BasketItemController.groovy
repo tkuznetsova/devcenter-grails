@@ -1,6 +1,6 @@
 package eshop
 
-import authentication.AuthenticationController
+import authentication.*
 import org.springframework.dao.DataIntegrityViolationException
 
 class BasketItemController {
@@ -176,7 +176,29 @@ class BasketItemController {
 	}
 	
 	def findBasketItem(id) {
-		def basketItemInstance = new BasketItem().find {id}
+		def basketItemInstance = new BasketItem().get(id)
 		return basketItemInstance
 	}
+	
+	def setOrder(basketId, orderId) {		
+		def basket = new BasketController().findBasket(basketId) 
+		// TODO: 1-BasketItemController-setOrder says: basket is not found!
+		
+		def itemList = BasketItem.findByBasket(basket)
+		// TODO: 2-BasketItemController-setOrder says: itemList is not set!
+
+		def order = new OrderController().findOrder(orderId)
+		// TODO: 3-BasketItemController-setOrder says: order is not found!
+	
+		for (BasketItem item in itemList) {
+			item.order = order
+			if(!item.save(flush: true)) {
+				return false
+			}
+			// TODO: 4-BasketItemController-setOrder says: basketItem.order_id is not saved!
+		}
+		
+	}
+	
+	
 }

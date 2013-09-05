@@ -88,6 +88,12 @@
 			<g:form>
 				<fieldset class="buttons">
 					<g:hiddenField name="id" value="${orderInstance?.id}" />
+					<g:link action="pay" id="${orderInstance?.id}"><g:message code="default.button.pay.label" default="Pay" /></g:link>
+					<paypal:button itemName="${orderInstance?.basket}" 
+					   itemNumber="IPD32048039"
+					   amount="99.00"
+					   buyerId="1"
+					   />
 					<g:link class="edit" action="edit" id="${orderInstance?.id}"><g:message code="default.button.edit.label" default="Edit" /></g:link>
 					<g:actionSubmit class="delete" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
 				</fieldset>

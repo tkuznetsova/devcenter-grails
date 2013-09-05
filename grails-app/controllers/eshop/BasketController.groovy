@@ -30,17 +30,32 @@ class BasketController {
 	}
 	
 	def findBasket(id) {
-		def basketInstance = new Basket().find {id}
+		def basketInstance = new Basket().get(id)
 		return basketInstance 
 	}
 	
 	def order() {		
 		def basketInstance = Basket.get(session.user.basketId)
-		def orderInstance = new OrderController().create(params: [payment: "${basketInstance.basketCost}"])
-		if(!orderInstance) {
-			println "OrderControlle-order says: order creation fails"
+		if(basketInstance) {
+			def orderInstance = new OrderController().create(params: [payment: "${basketInstance.basketCost}"])
+			if(!orderInstance) {
+				println "A - OrderControlle-order says: order creation fails"
+			}else{	
+				def order = new OrderController().findOrder(orderInstance.id)
+				if (order) {
+					def basketItemIsSaved = new BasketItemController().setOrder(basketInstance.id, order.id)
+					if(basketItemIsSaved) {
+						redirect(controller: "order", action: "show")
+					}else{
+						println "C - OrderControlle-order says: order setting fails"
+					}
+				}else {
+					println "D - OrderControlle-order says: order is not found"
+				}
+			}
+		}else {
+			println "B - OrderControlle-order says: basket is not got"
 		}
-		redirect(controller: "order", action: "show")
 	}
 	
 	def save() {
@@ -56,8 +71,8 @@ class BasketController {
 	
 	def show(Long id) {
 		println params
-		Basket basketInstance = Basket.get(params.id)
-		println basketInstance.user.name
+		Basket basketInstance = Basket.get(id)
+		
 		if (!basketInstance) {
 			flash.message = message(code: 'default.not.found.message', args: [message(code: 'basket.label', default: 'Basket'), id])
 			redirect(action: "list")

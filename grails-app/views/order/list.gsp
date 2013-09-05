@@ -16,9 +16,7 @@
 		</div>
 		<div id="list-order" class="content scaffold-list" role="main">
 			<h1><g:message code="default.list.label" args="[entityName]" /></h1>
-			<g:if test="${flash.message}">
-			<div class="message" role="status">${flash.message}</div>
-			</g:if>
+			
 			<table>
 				<thead>
 					<tr>
@@ -51,7 +49,20 @@
 					
 						<td><g:formatDate date="${orderInstance.shippedDate}" /></td>
 					
-						<td>${fieldValue(bean: orderInstance, field: "status")}</td>
+						<td>
+						<g:if test="${fieldValue(bean: orderInstance, field: "status") == '0'}">
+							<g:message code="order.status.new.label" default="New"/>
+						</g:if>
+						<g:elseif test="${fieldValue(bean: orderInstance, field: "status") == '1'}">
+							<g:message code="order.status.waiting.label" default="Waiting"/>
+						</g:elseif>
+						<g:elseif test="${fieldValue(bean: orderInstance, field: "status") == '2'}">
+							<g:message code="order.status.paid.label" default="Paid"/>
+						</g:elseif>
+						<g:elseif test="${fieldValue(bean: orderInstance, field: "status") == '3'}">
+							<g:message code="order.status.shipped.label" default="Shipped"/>
+						</g:elseif>
+						</td>
 					
 					</tr>
 				</g:each>

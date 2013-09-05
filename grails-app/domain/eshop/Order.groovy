@@ -13,6 +13,7 @@ class Order {
 	
 	Long id
 	AuthenticationUser authentication
+
 	Date orderDate = new Date()
 	Date requiredDate = orderDate + 14
 	Double paymentAmount=1

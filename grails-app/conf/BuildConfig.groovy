@@ -59,6 +59,8 @@ grails.project.dependency.resolution = {
 
         runtime ":database-migration:1.2.1"
 		runtime ":js-tree:0.3.1"
+		runtime ":searchable:0.6.4"
+		runtime ":quartz:0.4.2"
 		runtime ":mail:1.0.1"
 		runtime ":code-coverage:1.2.6"
 

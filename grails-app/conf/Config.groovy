@@ -62,10 +62,18 @@ grails.hibernate.cache.queries = false
 environments {
     development {
         grails.logging.jul.usebridge = true
+
+		grails.paypal.server = "https://www.sandbox.paypal.com/cgi-bin/webscr"
+		grails.paypal.email = "trotilla87@gmail.com" // seller
+		grails.serverURL = "http://localhost:8080/${appName}"
     }
     production {
         grails.logging.jul.usebridge = false
         // TODO: grails.serverURL = "http://www.changeme.com"
+		
+		grails.paypal.server = "https://www.paypal.com/cgi-bin/webscr"
+		grails.paypal.email = "trotilla87@gmail.com"
+		grails.serverURL = "http://www.grails.org"
     }
 }
 
@@ -95,3 +103,17 @@ log4j = {
 coverage { enabledByDefault = true}
 
 //the _Events.groovy script in the plugin target/test-reports/cobertura/coverage.xml
+
+grails {
+	mail {
+	host = "smtp.gmail.com"
+	port = 465
+	username = "trotilla87@gmail.com"
+	password = "293drlKTA"
+	props = ["mail.smtp.auth":"true",
+	"mail.smtp.socketFactory.port":"465",
+	"mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
+	"mail.smtp.socketFactory.fallback":"false"]
+	}
+	}
+	
