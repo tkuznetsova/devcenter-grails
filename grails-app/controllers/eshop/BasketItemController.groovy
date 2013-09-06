@@ -184,20 +184,22 @@ class BasketItemController {
 		def basket = new BasketController().findBasket(basketId) 
 		// TODO: 1-BasketItemController-setOrder says: basket is not found!
 		
-		def itemList = BasketItem.findByBasket(basket)
+		def itemList = BasketItem.findAllByBasket(basket)
 		// TODO: 2-BasketItemController-setOrder says: itemList is not set!
 
-		def order = new OrderController().findOrder(orderId)
+		def order = new OrderController().findOrder(orderId, false)
 		// TODO: 3-BasketItemController-setOrder says: order is not found!
 	
 		for (BasketItem item in itemList) {
 			item.order = order
 			if(!item.save(flush: true)) {
+				println "B - BasketItemControlle-setOrder says: item is not saved"
 				return false
 			}
+				
 			// TODO: 4-BasketItemController-setOrder says: basketItem.order_id is not saved!
 		}
-		
+		return true
 	}
 	
 	

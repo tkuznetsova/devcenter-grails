@@ -38,23 +38,22 @@ class BasketController {
 		def basketInstance = Basket.get(session.user.basketId)
 		if(basketInstance) {
 			def orderInstance = new OrderController().create(params: [payment: "${basketInstance.basketCost}"])
-			if(!orderInstance) {
-				println "A - OrderControlle-order says: order creation fails"
-			}else{	
-				def order = new OrderController().findOrder(orderInstance.id)
-				if (order) {
-					def basketItemIsSaved = new BasketItemController().setOrder(basketInstance.id, order.id)
-					if(basketItemIsSaved) {
-						redirect(controller: "order", action: "show")
-					}else{
-						println "C - OrderControlle-order says: order setting fails"
-					}
-				}else {
-					println "D - OrderControlle-order says: order is not found"
+			// TODO: A - OrderControlle-order says: order creation fails
+
+			def order = new OrderController().findOrder(session.user.id, true)
+			if (order) {
+				def basketItemIsSaved = new BasketItemController().setOrder(basketInstance.id, order.id)
+				if(basketItemIsSaved) {
+					redirect(controller: "order", action: "show")
+				}else{
+					println "C - BasketControlle-order says: order setting fails"
 				}
+			}else {
+				println "D - BasketControlle-order says: order is not found"
 			}
+			
 		}else {
-			println "B - OrderControlle-order says: basket is not got"
+			println "B - BasketControlle-order says: basket is not got"
 		}
 	}
 	

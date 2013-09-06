@@ -158,7 +158,7 @@ class AuthenticationController {
 	}
 	
 	def findUser(id) {
-		def userInstance = new AuthenticationUser().find {session?.user?.id}
+		def userInstance = new AuthenticationUser().get(session?.user?.id)
 		return userInstance
 	}
 	

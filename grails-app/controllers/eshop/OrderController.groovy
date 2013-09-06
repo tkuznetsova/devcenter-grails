@@ -30,15 +30,21 @@ class OrderController {
 			println "${session.user.login} OrderController-create says USER not found"
 		}
 		if(orderInstance.save(flush: true)) {
-			[orderInstance: orderInstance]
+
 		}else {
 			println "${session.user.login} OrderController-create says orderInstance unsaved"
 		}
 	
 	}
 	
-	def findOrder(id) {
-		def orderInstance = new Order().get(id)
+	def findOrder(id, byAuthentication) {
+		def orderInstance
+		if(byAuthentication) {
+			def userInstance = new AuthenticationController().findUser(id)
+			orderInstance = Order.findByAuthentication(userInstance)
+		}else{
+			orderInstance = new Order().get(id)
+		}
 		return orderInstance
 	}
 
