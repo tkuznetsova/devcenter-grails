@@ -195,12 +195,19 @@ class BasketItemController {
 			if(!item.save(flush: true)) {
 				println "B - BasketItemControlle-setOrder says: item is not saved"
 				return false
-			}
-				
+			}	
 			// TODO: 4-BasketItemController-setOrder says: basketItem.order_id is not saved!
 		}
 		return true
 	}
 	
+	def findBasketItemList(someId, byOrder) {
+		if(byOrder) {
+			def orderInstance = new OrderController().findOrder(someId, false)
+			return BasketItem.findAllByOrder(orderInstance)
+		}else{
+			return BasketItem.get(someId)
+		}
+	}
 	
 }

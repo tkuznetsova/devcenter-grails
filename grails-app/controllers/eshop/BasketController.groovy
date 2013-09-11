@@ -11,6 +11,11 @@ class BasketController {
         redirect(action: "show", params: params)
     }
 
+	/**
+	 * Used by AuthenticationController signup()
+	 * @param id
+	 * @return Basket instance
+	 */
 	def create(id) {
 		def basketInstance = new Basket(params)
 		params.basketCost=0.0
@@ -29,11 +34,20 @@ class BasketController {
 		return basketInstance
 	}
 	
+	/**
+	 * Used by different Controllers
+	 * @param id Basket
+	 * @return Basket instance
+	 */
 	def findBasket(id) {
 		def basketInstance = new Basket().get(id)
 		return basketInstance 
 	}
 	
+	/**
+	 * Make order
+	 * @return Order view
+	 */
 	def order() {		
 		def basketInstance = Basket.get(session.user.basketId)
 		if(basketInstance) {
@@ -44,7 +58,9 @@ class BasketController {
 			if (order) {
 				def basketItemIsSaved = new BasketItemController().setOrder(basketInstance.id, order.id)
 				if(basketItemIsSaved) {
+					def basketItemList = new BasketItemController().findBasketItemList(order.id, true)
 					redirect(controller: "order", action: "show")
+					[basketItemList: basketItemList]
 				}else{
 					println "C - BasketControlle-order says: order setting fails"
 				}
@@ -144,6 +160,11 @@ class BasketController {
         }
     }
 	
+	 /**
+	  * Purchase addition to the basket
+	  * @param id BasketItem
+	  * @return Basket view
+	  */
 	def addToBasket(Long id) {
 		def basketInstance = Basket.get(session.user.basketId)
 		def purchase = new BasketItemController().findBasketItem(id)		
@@ -163,7 +184,12 @@ class BasketController {
 		redirect(controller:"basket", action:"show", id:"${session.user.basketId}")
 		}
 	}
-		
+	
+	/**
+	 * Product removal from basket
+	 * @param id
+	 * @return view
+	 */
 	def removePurchase(Long id) { // fromBasket
 		println params
 		def p = BasketItem.get( id )

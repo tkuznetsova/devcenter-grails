@@ -9,6 +9,7 @@
 		<title><g:message code="default.show.label" args="[entityName]" /></title>
 	</head>
 	<body>
+	
 		<a href="#show-basket" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
 		<div class="nav" role="navigation">
 			<ul>
@@ -24,10 +25,11 @@
 			<g:if test="${flash.message}">
 			<div class="message" role="status">${flash.message}</div>
 			</g:if>
+			
 			<table>
 			<thead>
 				<tr>
-					<g:sortableColumn property="id" title="${message(code: 'basket.id.label', default: 'ID')}" />
+					<th><g:message code="" default="" /></th>
 					<g:sortableColumn property="name" title="${message(code: 'basket.name.label', default: 'Name')}" />
 					<g:sortableColumn property="manufacturer" title="${message(code: 'basket.manufacturer.label', default: 'Manufacturer')}" />
 					<g:sortableColumn property="characteristics" title="${message(code: 'basket.characteristics.label', default: 'Characteristics')}" />
@@ -40,9 +42,11 @@
 			<tbody>
 				<g:each in="${basketInstance.purchase}" var="purchase">
 					<tr>
-						<td>
-							${purchase.id}
-						</td>
+						
+						<td><g:remoteLink controller="paypal" action="test" id="${purchase.id}">
+								<g:message code="default.link.buy.label" default="Buy"/>
+							</g:remoteLink></td>
+								
 						<td><g:link controller="good" action="show"
 								id="${purchase.good.id}">
 								${purchase.good.name}

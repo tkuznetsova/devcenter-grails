@@ -1,12 +1,18 @@
 package paypal
 
+import eshop.*
+
 class PaypalController {
 	
     static allowedMethods = [buy:'POST', notify:'POST']
 	
 	def test() {
-		
+		[purchase: new BasketItemController().findBasketItemList(purchase.id, false)]
 	}
+
+	 def index(){
+		 def result = new PaypalTagLib().button
+	 }
 	
 	def notifyPaypal = {
 		log.debug "Received IPN notification from PayPal Server ${params}"		

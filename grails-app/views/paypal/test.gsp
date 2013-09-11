@@ -6,6 +6,11 @@
 	</head>
 	
 	<body id="body">
+		<paypal:button itemName="${purchase.good.name}" 
+					itemNumber="${purchase.id}"
+					amount="${purchase.cost}"
+					buyerId="${purchase.user}"/>
+				
 		<paypal:button itemName="iPod Nano" 
 					   itemNumber="IPD32048039"
 					   amount="99.00"

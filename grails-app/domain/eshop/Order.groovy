@@ -24,8 +24,8 @@ class Order {
 		paymentAmount blank: false, nullable: false
 		shippedDate blank: true, nullable: true
 		status(inList:[
-			0,
-			1
+			0, // new
+			1  // payed
 		])
     }
 }
