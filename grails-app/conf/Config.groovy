@@ -73,7 +73,7 @@ environments {
 		
 		grails.paypal.server = "https://www.paypal.com/cgi-bin/webscr"
 		grails.paypal.email = "trotilla87@gmail.com"
-		grails.serverURL = "http://www.grails.org"
+		grails.serverURL = "http://boiling-waters-6307.herokuapp.com"
     }
 }
 
