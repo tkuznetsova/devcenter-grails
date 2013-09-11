@@ -41,8 +41,8 @@ grails.project.dependency.resolution = {
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes e.g.
 
-         runtime 'mysql:mysql-connector-java:5.1.24'
-       // runtime 'postgresql:postgresql:8.4-702.jdbc3'
+        //runtime 'mysql:mysql-connector-java:5.1.24'
+       	runtime 'postgresql:postgresql:8.4-702.jdbc3'
     }
 
     plugins {
@@ -59,7 +59,6 @@ grails.project.dependency.resolution = {
 
         runtime ":database-migration:1.2.1"
 		runtime ":js-tree:0.3.1"
-		runtime ":searchable:0.6.4"
 		runtime ":mail:1.0.1"
 		runtime ":code-coverage:1.2.6"
 
