@@ -98,18 +98,12 @@ log4j = {
            'net.sf.ehcache.hibernate'
 }
 
-// TODO:
-// "grails test-app -coverage" // to generate the coverage reports.
-coverage { enabledByDefault = true}
-
-//the _Events.groovy script in the plugin target/test-reports/cobertura/coverage.xml
-
 grails {
 	mail {
 	host = "smtp.gmail.com"
 	port = 465
 	username = "trotilla87@gmail.com"
-	password = "293drlKTA"
+	password = "*******"
 	props = ["mail.smtp.auth":"true",
 	"mail.smtp.socketFactory.port":"465",
 	"mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",

@@ -60,14 +60,8 @@ grails.project.dependency.resolution = {
         runtime ":database-migration:1.2.1"
 		runtime ":js-tree:0.3.1"
 		runtime ":mail:1.0.1"
-		runtime ":code-coverage:1.2.6"
 
         compile ':cache:1.0.1'
     }
-	
-	coverage {
-		enabledByDefault = true
-		nopost = false
-		xml = true
-	}
+
 }
